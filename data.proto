@@ -1,0 +1,59 @@
+syntax = "proto3";
+
+package ThomasBrillion\Notification\Backend\Data;
+
+import "google/protobuf/timestamp.proto";
+
+message Action {
+    string url = 1; // URL to redirect when the action is taken
+    string label = 2; // Label for the action button
+    string backgroundColor = 3; // Background color for the action button
+    string textColor = 4; // Text color for the action button
+}
+
+message Notification {
+  string id = 1; // String because it can be UUID or any other unique identifier
+  string title = 2;
+  string message = 3;
+  string type = 4; // e.g., "info", "warning", "error", "success"
+  int32 priority = 5; // Priority level of the notification (1-5). Lower number means higher priority
+  string user_id = 6; // ID of the user to whom the notification is sent
+  boolean persistent = 7; // Whether the notification should persist until dismissed
+  optional google.protobuf.Timestamp read_at = 8; // Timestamp when the notification was read
+  optional google.protobuf.Timestamp created_at = 9; // Timestamp when the notification was created
+  optional string icon = 10; // Icon to display with the notification
+  optional string topic_id = 11; // Topic ID for the notification, if applicable
+  repeated Action actions = 12; // List of actions associated with the notification
+}
+
+message SendNotificationResponse {
+    bool success = 1; // Indicates whether the notification was sent successfully
+    string message = 2; // Optional message providing additional information
+}
+
+message GetNotificationsRequest {
+    string user_id = 1; // ID of the user for whom to retrieve notifications
+    int32 limit = 2; // Maximum number of notifications to retrieve
+    int32 offset = 3; // Offset for pagination
+}
+
+message GetNotificationsResponse {
+    repeated Notification notifications = 1; // List of notifications for the user
+    int32 total_count = 2; // Total number of notifications available for the user
+}
+
+message MarkAsReadAllRequest {
+    string user_id = 1; // ID of the user for whom to mark all notifications as read
+    repeated string notification_ids = 2; // List of notification IDs to mark as read
+}
+
+message MarkAsReadRequest {
+    string user_id = 1; // ID of the user for whom to mark the notification as read
+    string notification_id = 2; // ID of the notification to mark as read
+}
+
+message MarkAsReadResponse {
+    bool success = 1; // Indicates whether the operation was successful
+}
+
+

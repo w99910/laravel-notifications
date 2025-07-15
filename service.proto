@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package ThomasBrillion\Notification\Backend\Service;
+
+import "data.proto";
+
+service NotificationService {
+  // Send a notification to the user
+  rpc sendNotification(Notification) returns (SendNotificationResponse);
+
+  // Get a list of notifications for the user
+  rpc getNotifications(GetNotificationsRequest) returns (GetNotificationsResponse);
+
+  // Mark a notification as read
+  rpc markAsRead(MarkAsReadRequest) returns (MarkAsReadResponse);
+
+  rpc markAsReadAll(MarkAsReadAllRequest) returns (MarkAsReadResponse);
+
+ // Delete a notification
+  rpc deleteNotification(DeleteNotificationRequest) returns (DeleteNotificationResponse);
+}
