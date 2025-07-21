@@ -41,6 +41,7 @@ test('has correct fillable attributes', function () {
         'actions',
         'progress',
         'attachment',
+        'read_at',
     ];
 
     expect($notification->getFillable())->toBe($expected);

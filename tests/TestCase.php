@@ -74,6 +74,15 @@ abstract class TestCase extends OrchestraTestCase
         // Set up event config
         $app['config']->set('app.env', 'testing');
 
+        $app['config']->set('notification', [
+            'models' => [
+                'notification' => \Thomasbrillion\Notification\Models\Notification::class,
+            ],
+            'middleware' => 'auth',
+            'prefix' => 'notifications',
+            'table_name' => 'test_notifications',
+        ]);
+
         // Set up notification config
         // $app['config']->set('notification.models.notification', \Thomasbrillion\Notification\Models\Notification::class);
         // $app['config']->set('notification.middleware', 'auth');

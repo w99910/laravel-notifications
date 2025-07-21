@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Support\Facades\Event;
+use Thomasbrillion\Notification\Models\Notification as NotificationModel;
 use Thomasbrillion\Notification\Services\NotificationService;
 use Thomasbrillion\Notification\Tests\Models\User;
 
@@ -123,7 +123,7 @@ test('getReadNotifications returns only read notifications', function () {
     $user = new User(['id' => 24]);
     $service = new NotificationService($user);
 
-    $service->createNotification([
+    $notification = $service->createNotification([
         'title' => 'Read 1',
         'message' => 'Body',
         'status' => 'info',
@@ -135,8 +135,9 @@ test('getReadNotifications returns only read notifications', function () {
         'status' => 'info',
         'user_id' => $user->id,
     ]);
+
     // Mark the first notification as read
-    $service->markAsRead(1);
+    $service->markAsRead($notification->id);
 
     $read = $service->getReadNotifications();
 
@@ -154,14 +155,14 @@ test('getUnreadNotifications returns only unread notifications', function () {
         'status' => 'info',
         'user_id' => $user->id,
     ]);
-    $service->createNotification([
+    $notification = $service->createNotification([
         'title' => 'Read 1',
         'message' => 'Body',
         'status' => 'info',
         'user_id' => $user->id,
     ]);
     // Mark the second notification as read
-    $service->markAsRead(2);
+    $service->markAsRead($notification->id);
 
     $unread = $service->getUnreadNotifications();
     expect($unread)->toHaveCount(1);
@@ -172,17 +173,19 @@ test('readNotificationsCount returns correct count', function () {
     $user = new User(['id' => 26]);
     $service = new NotificationService($user);
 
+    $notificationIds = [];
     foreach (range(1, 3) as $i) {
-        $service->createNotification([
+        $notification = $service->createNotification([
             'title' => "Notification $i",
             'message' => "Body $i",
             'status' => 'info',
             'user_id' => $user->id,
         ]);
+        $notificationIds[] = $notification->id;
     }
     // Mark two notifications as read
-    $service->markAsRead(1);
-    $service->markAsRead(2);
+    $service->markAsRead($notificationIds[0]);
+    $service->markAsRead($notificationIds[1]);
 
     $count = $service->getReadNotificationsCount();
     expect($count)->toBe(2);
@@ -192,16 +195,18 @@ test('unreadNotificationsCount returns correct count', function () {
     $user = new User(['id' => 27]);
     $service = new NotificationService($user);
 
+    $notificationIds = [];
     foreach (range(1, 4) as $i) {
-        $service->createNotification([
+        $notification = $service->createNotification([
             'title' => "Notification $i",
             'message' => "Body $i",
             'status' => 'info',
             'user_id' => $user->id,
         ]);
+        $notificationIds[] = $notification->id;
     }
     // Mark one notification as read
-    $service->markAsRead(1);
+    $service->markAsRead($notificationIds[0]);
 
     $count = $service->getUnreadNotificationsCount();
     expect($count)->toBe(3);

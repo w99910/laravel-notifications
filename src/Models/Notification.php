@@ -20,6 +20,7 @@ class Notification extends Model implements NotificationInterface
         'actions',
         'progress',
         'attachment',
+        'read_at',
     ];
 
     protected $casts = [
@@ -28,6 +29,11 @@ class Notification extends Model implements NotificationInterface
         'actions' => 'array',
         'progress' => 'integer',
     ];
+
+    public function getTable(): string
+    {
+        return config('notification.table_name', 'notifications');
+    }
 
     public function getId(): int|string
     {
