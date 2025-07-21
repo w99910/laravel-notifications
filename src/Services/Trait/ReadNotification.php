@@ -2,24 +2,25 @@
 
 namespace Thomasbrillion\Notification\Services\Trait;
 
-trait DeleteNotifications
+trait ReadNotification
 {
     use BaseDependency;
 
-    public function deleteNotification(int|string $notificationId): bool
+    public function markAsRead(int|string $notificationId): bool
     {
         return $this
-            ->getNotificationQuery()
+            ->getDBQuery()
             ->where('user_id', $this->getUser()->id)
             ->where('id', $notificationId)
-            ->delete();
+            ->update(['read_at' => now()]);
     }
 
-    public function deleteAllNotifications(): bool
+    public function markAllAsRead(): bool
     {
         return $this
-            ->getNotificationQuery()
+            ->getDBQuery()
             ->where('user_id', $this->getUser()->id)
-            ->delete();
+            ->whereNull('read_at')
+            ->update(['read_at' => now()]);
     }
 }

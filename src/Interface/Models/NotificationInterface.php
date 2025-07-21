@@ -4,21 +4,21 @@ namespace Thomasbrillion\Notification\Interface\Models;
 
 interface NotificationInterface
 {
+    public function getId(): int|string;
+
     public function getTitle(): string;
 
-    public function getBody(): string;
+    public function getMessage(): string;
 
-    public function getUserId(): int;
+    public function getUserId(): int|string;
 
-    public function getType(): string;
+    public function getStatus(): string;
 
     public function getPriority(): int;
 
-    public function getTopicId(): ?int;
+    public function getCategory(): string;
 
-    public function isPersistent(): bool;
-
-    public function getIcon(): ?string;
+    public function getAvatar(): ?string;
 
     public function getReadAt(): ?\DateTime;
 
@@ -26,5 +26,11 @@ interface NotificationInterface
 
     public function getActions(): array;
 
-    public function getQuery(): \Illuminate\Database\Query\Builder;
+    public function getProgress(): ?int;
+
+    public function getAttachment(): ?string;
+
+    public function getDBQuery(): \Illuminate\Database\Query\Builder;
+
+    public function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder;
 }

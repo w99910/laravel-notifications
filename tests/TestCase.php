@@ -7,6 +7,13 @@ use Thomasbrillion\Notification\NotificationServiceProvider;
 
 abstract class TestCase extends OrchestraTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->loadMigrationsFrom(__DIR__ . '/../database/migrations');
+    }
+
     /**
      * Get package providers.
      *
@@ -35,5 +42,18 @@ abstract class TestCase extends OrchestraTestCase
             'database' => ':memory:',
             'prefix' => '',
         ]);
+
+        // Set up broadcasting config
+        $app['config']->set('broadcasting.default', 'null');
+        $app['config']->set('broadcasting.connections.null', [
+            'driver' => 'null',
+        ]);
+
+        // Set up event config
+        $app['config']->set('app.env', 'testing');
+
+        // Set up notification config
+        // $app['config']->set('notification.models.notification', \Thomasbrillion\Notification\Models\Notification::class);
+        // $app['config']->set('notification.middleware', 'auth');
     }
 }

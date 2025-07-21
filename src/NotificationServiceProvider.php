@@ -4,6 +4,7 @@ namespace Thomasbrillion\Notification;
 
 use Illuminate\Support\Facades\Broadcast;
 use Illuminate\Support\ServiceProvider;
+use Thomasbrillion\Notification\Services\NotificationService;
 
 class NotificationServiceProvider extends ServiceProvider
 {
@@ -14,8 +15,6 @@ class NotificationServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        Broadcast::channel('users.{id}', function ($user, $id) {
-            return (int) $user->id === (int) $id;
-        });
+        $this->loadRoutesFrom(__DIR__ . '/../routes/web.php');
     }
 }

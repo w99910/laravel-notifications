@@ -7,26 +7,51 @@ use \Illuminate\Database\Eloquent\Model;
 
 class Notification extends Model implements NotificationInterface
 {
-    protected $fillable = ['title', 'body', 'user_id', 'type', 'priority', 'topic_id', 'persistent', 'icon', 'read_at', 'created_at', 'actions'];
+    protected $fillable = [
+        'title',
+        'message',
+        'user_id',
+        'status',
+        'priority',
+        'category',
+        'avatar',
+        'read_at',
+        'created_at',
+        'actions',
+        'progress',
+        'attachment',
+    ];
+
+    protected $casts = [
+        'read_at' => 'datetime',
+        'created_at' => 'datetime',
+        'actions' => 'array',
+        'progress' => 'integer',
+    ];
+
+    public function getId(): int|string
+    {
+        return $this->id;
+    }
 
     public function getTitle(): string
     {
         return $this->title;
     }
 
-    public function getBody(): string
+    public function getMessage(): string
     {
-        return $this->body;
+        return $this->message;
     }
 
-    public function getUserId(): int
+    public function getUserId(): int|string
     {
         return $this->user_id;
     }
 
-    public function getType(): string
+    public function getStatus(): string
     {
-        return $this->type;
+        return $this->status;
     }
 
     public function getPriority(): int
@@ -34,33 +59,48 @@ class Notification extends Model implements NotificationInterface
         return $this->priority;
     }
 
-    public function getTopicId(): ?int
+    public function getCategory(): string
     {
-        return $this->topic_id;
+        return $this->category;
     }
 
-    public function isPersistent(): bool
+    public function getAvatar(): ?string
     {
-        return $this->persistent;
-    }
-
-    public function getIcon(): ?string
-    {
-        return $this->icon;
+        return $this->avatar;
     }
 
     public function getReadAt(): ?\DateTime
     {
-        return $this->read_at ? new \DateTime($this->read_at) : null;
+        return $this->read_at;
     }
 
     public function getCreatedAt(): \DateTime
     {
-        return new \DateTime($this->created_at);
+        return $this->created_at;
     }
 
     public function getActions(): array
     {
         return $this->actions ?? [];
+    }
+
+    public function getProgress(): ?int
+    {
+        return $this->progress;
+    }
+
+    public function getAttachment(): ?string
+    {
+        return $this->attachment;
+    }
+
+    public function getDBQuery(): \Illuminate\Database\Query\Builder
+    {
+        return $this->getQuery();
+    }
+
+    public function getEloquentQuery(): \Illuminate\Database\Eloquent\Builder
+    {
+        return $this->newQuery();
     }
 }
