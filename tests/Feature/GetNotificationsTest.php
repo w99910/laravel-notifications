@@ -10,14 +10,14 @@ test('get notifications with order by descending', function () {
 
     $service->createNotification([
         'title' => 'First',
-        'body' => 'First body',
-        'type' => 'info',
+        'message' => 'First body',
+        'status' => 'info',
         'user_id' => $user->id,
     ]);
     $service->createNotification([
         'title' => 'Second',
-        'body' => 'Second body',
-        'type' => 'info',
+        'message' => 'Second body',
+        'status' => 'info',
         'user_id' => $user->id,
     ]);
 
@@ -33,8 +33,8 @@ test('get notifications with offset and limit', function () {
     foreach (range(1, 5) as $i) {
         $service->createNotification([
             'title' => "Notification $i",
-            'body' => "Body $i",
-            'type' => 'info',
+            'message' => "Body $i",
+            'status' => 'info',
             'user_id' => $user->id,
         ]);
     }
@@ -52,15 +52,15 @@ test('get notifications with start_date and end_date', function () {
 
     $service->createNotification([
         'title' => 'Old Notification',
-        'body' => 'Old',
-        'type' => 'info',
+        'message' => 'Old',
+        'status' => 'info',
         'user_id' => $user->id,
         'created_at' => now()->subDays(10),
     ]);
     $service->createNotification([
         'title' => 'Recent Notification',
-        'body' => 'Recent',
-        'type' => 'info',
+        'message' => 'Recent',
+        'status' => 'info',
         'user_id' => $user->id,
         'created_at' => now()->subDays(2),
     ]);
@@ -83,8 +83,8 @@ test('get notifications with limit only', function () {
     foreach (range(1, 4) as $i) {
         $service->createNotification([
             'title' => "Notification $i",
-            'body' => "Body $i",
-            'type' => 'info',
+            'message' => "Body $i",
+            'status' => 'info',
             'user_id' => $user->id,
         ]);
     }
@@ -101,15 +101,15 @@ test('get notifications with priority filter', function () {
 
     $service->createNotification([
         'title' => 'Low Priority',
-        'body' => 'Low',
-        'type' => 'info',
+        'message' => 'Low',
+        'status' => 'info',
         'user_id' => $user->id,
         'priority' => 1,
     ]);
     $service->createNotification([
         'title' => 'High Priority',
-        'body' => 'High',
-        'type' => 'info',
+        'message' => 'High',
+        'status' => 'info',
         'user_id' => $user->id,
         'priority' => 10,
     ]);
@@ -125,20 +125,21 @@ test('getReadNotifications returns only read notifications', function () {
 
     $service->createNotification([
         'title' => 'Read 1',
-        'body' => 'Body',
-        'type' => 'info',
+        'message' => 'Body',
+        'status' => 'info',
         'user_id' => $user->id,
     ]);
     $service->createNotification([
         'title' => 'Unread 1',
-        'body' => 'Body',
-        'type' => 'info',
+        'message' => 'Body',
+        'status' => 'info',
         'user_id' => $user->id,
     ]);
     // Mark the first notification as read
     $service->markAsRead(1);
 
     $read = $service->getReadNotifications();
+
     expect($read)->toHaveCount(1);
     expect($read[0]->title)->toBe('Read 1');
 });
@@ -149,14 +150,14 @@ test('getUnreadNotifications returns only unread notifications', function () {
 
     $service->createNotification([
         'title' => 'Unread 1',
-        'body' => 'Body',
-        'type' => 'info',
+        'message' => 'Body',
+        'status' => 'info',
         'user_id' => $user->id,
     ]);
     $service->createNotification([
         'title' => 'Read 1',
-        'body' => 'Body',
-        'type' => 'info',
+        'message' => 'Body',
+        'status' => 'info',
         'user_id' => $user->id,
     ]);
     // Mark the second notification as read
@@ -174,8 +175,8 @@ test('readNotificationsCount returns correct count', function () {
     foreach (range(1, 3) as $i) {
         $service->createNotification([
             'title' => "Notification $i",
-            'body' => "Body $i",
-            'type' => 'info',
+            'message' => "Body $i",
+            'status' => 'info',
             'user_id' => $user->id,
         ]);
     }
@@ -194,8 +195,8 @@ test('unreadNotificationsCount returns correct count', function () {
     foreach (range(1, 4) as $i) {
         $service->createNotification([
             'title' => "Notification $i",
-            'body' => "Body $i",
-            'type' => 'info',
+            'message' => "Body $i",
+            'status' => 'info',
             'user_id' => $user->id,
         ]);
     }

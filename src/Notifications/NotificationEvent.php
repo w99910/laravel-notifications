@@ -7,6 +7,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
+use Thomasbrillion\Notification\Interface\Models\NotificationInterface;
 
 class NotificationEvent extends Notification implements ShouldBroadcast
 {

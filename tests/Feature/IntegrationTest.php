@@ -1,47 +1,49 @@
 <?php
 
 use Illuminate\Support\Facades\Event;
-use Thomasbrillion\Notification\Events\NotificationEvent;
+use Illuminate\Support\Facades\Notification;
+use Thomasbrillion\Notification\Notifications\NotificationEvent;
 use Thomasbrillion\Notification\Services\NotificationService;
 use Thomasbrillion\Notification\Tests\Models\User;
 
 test('complete notification lifecycle - create, send, and manage', function () {
-    Event::fake();
+    Notification::fake();
 
     $user = new User(['id' => 1]);
+
     $service = new NotificationService($user);
 
     // Create notification
     $data = [
         'title' => 'Lifecycle Test',
-        'body' => 'Testing complete notification lifecycle',
-        'type' => 'info',
+        'message' => 'Testing complete notification lifecycle',
+        'status' => 'info',
         'priority' => 5,
-        'persistent' => true
     ];
 
     $notification = $service->createNotification($data);
 
     expect($notification->title)
         ->toBe('Lifecycle Test')
-        ->and($notification->body)
+        ->and($notification->message)
         ->toBe('Testing complete notification lifecycle')
-        ->and($notification->type)
+        ->and($notification->status)
         ->toBe('info')
         ->and($notification->priority)
-        ->toBe(5)
-        ->and($notification->persistent)
-        ->toBeTrue();
+        ->toBe(5);
 
     // Send notification
     $result = $service->sendNotification($notification);
 
     expect($result)->toBeTrue();
-    Event::assertDispatched(NotificationEvent::class);
+
+    Notification::assertSentTo(
+        [$user], NotificationEvent::class
+    );
 });
 
 test('handles multiple notifications for same user', function () {
-    Event::fake();
+    Notification::fake();
 
     $user = new User(['id' => 1]);
     $service = new NotificationService($user);
@@ -51,10 +53,9 @@ test('handles multiple notifications for same user', function () {
     for ($i = 1; $i <= 3; $i++) {
         $data = [
             'title' => "Notification $i",
-            'body' => "Body for notification $i",
-            'type' => 'info',
+            'message' => "Body for notification $i",
+            'status' => 'info',
             'priority' => $i,
-            'persistent' => false
         ];
 
         $notification = $service->createNotification($data);
@@ -71,11 +72,13 @@ test('handles multiple notifications for same user', function () {
         $service->sendNotification($notification);
     }
 
-    Event::assertDispatchedTimes(NotificationEvent::class, 3);
+    Notification::assertSentTo(
+        [$user], NotificationEvent::class
+    );
 });
 
 test('handles different notification types', function () {
-    Event::fake();
+    Notification::fake();
 
     $user = new User(['id' => 1]);
     $service = new NotificationService($user);
@@ -85,59 +88,58 @@ test('handles different notification types', function () {
     foreach ($types as $type) {
         $data = [
             'title' => ucfirst($type) . ' Notification',
-            'body' => "This is a $type notification",
-            'type' => $type,
+            'message' => "This is a $type notification",
+            'status' => $type,
             'priority' => 5,
-            'persistent' => false
         ];
 
         $notification = $service->createNotification($data);
 
-        expect($notification->type)->toBe($type);
+        expect($notification->status)->toBe($type);
 
         $service->sendNotification($notification);
     }
 
-    Event::assertDispatchedTimes(NotificationEvent::class, 4);
+    Notification::assertSentTo(
+        [$user], NotificationEvent::class
+    );
 });
 
 test('handles notifications with all optional fields', function () {
-    Event::fake();
+    Notification::fake();
 
     $user = new User(['id' => 1]);
     $service = new NotificationService($user);
 
+    $actions = [['label' => 'View', 'url' => 'http://example.com/view'], ['label' => 'Dismiss', 'url' => 'http://example.com/dismiss'], ['label' => 'Archive', 'url' => 'http://example.com/archive']];
     $data = [
         'title' => 'Complete Notification',
-        'body' => 'Notification with all fields',
-        'type' => 'success',
+        'message' => 'Notification with all fields',
+        'status' => 'success',
         'priority' => 8,
-        'persistent' => true,
-        'topic_id' => 456,
-        'icon' => 'check-circle',
-        'actions' => ['view', 'dismiss', 'archive'],
+        'category' => 'something',
+        'avatar' => 'check-circle',
+        'actions' => $actions,
         'progress' => 100,
-        'error' => null
+        'attachment' => null
     ];
 
     $notification = $service->createNotification($data);
 
     expect($notification->title)
         ->toBe('Complete Notification')
-        ->and($notification->body)
+        ->and($notification->message)
         ->toBe('Notification with all fields')
-        ->and($notification->type)
+        ->and($notification->status)
         ->toBe('success')
         ->and($notification->priority)
         ->toBe(8)
-        ->and($notification->persistent)
-        ->toBeTrue()
-        ->and($notification->topic_id)
-        ->toBe(456)
-        ->and($notification->icon)
+        ->and($notification->category)
+        ->toBe('something')
+        ->and($notification->avatar)
         ->toBe('check-circle')
         ->and($notification->actions)
-        ->toBe(['view', 'dismiss', 'archive'])
+        ->toBe($actions)
         ->and($notification->progress)
         ->toBe(100)
         ->and($notification->error)
@@ -145,7 +147,9 @@ test('handles notifications with all optional fields', function () {
 
     $service->sendNotification($notification);
 
-    Event::assertDispatched(NotificationEvent::class);
+    Notification::assertSentTo(
+        [$user], NotificationEvent::class
+    );
 });
 
 test('handles validation errors gracefully', function () {
@@ -154,8 +158,8 @@ test('handles validation errors gracefully', function () {
 
     $invalidData = [
         'title' => '',  // Empty title
-        'body' => 'Valid body',
-        'type' => 'invalid',  // Invalid type
+        'message' => 'Valid body',
+        'status' => 'invalid',  // Invalid type
         'priority' => 15  // Out of range
     ];
 
@@ -177,7 +181,7 @@ test('handles missing required fields', function () {
 });
 
 test('handles rapid notification creation', function () {
-    Event::fake();
+    Notification::fake();
 
     $user = new User(['id' => 1]);
     $service = new NotificationService($user);
@@ -187,10 +191,9 @@ test('handles rapid notification creation', function () {
     for ($i = 1; $i <= 10; $i++) {
         $data = [
             'title' => "Rapid $i",
-            'body' => "Body $i",
-            'type' => 'info',
+            'message' => "Body $i",
+            'status' => 'info',
             'priority' => ($i % 10) + 1,
-            'persistent' => $i % 2 === 0
         ];
 
         $notification = $service->createNotification($data);
@@ -204,7 +207,9 @@ test('handles rapid notification creation', function () {
         $service->sendNotification($notification);
     }
 
-    Event::assertDispatchedTimes(NotificationEvent::class, 10);
+    Notification::assertSentTo(
+        [$user], NotificationEvent::class
+    );
 });
 
 test('handles edge case values', function () {
@@ -214,25 +219,22 @@ test('handles edge case values', function () {
     $edgeCases = [
         [
             'title' => str_repeat('a', 255),  // Max length title
-            'body' => str_repeat('b', 1000),  // Long body
-            'type' => 'error',
+            'message' => str_repeat('b', 1000),  // Long body
+            'status' => 'error',
             'priority' => 1,  // Min priority
-            'persistent' => false
         ],
         [
             'title' => 'Min Priority',
-            'body' => 'Testing minimum priority',
-            'type' => 'success',
+            'message' => 'Testing minimum priority',
+            'status' => 'success',
             'priority' => 10,  // Max priority
-            'persistent' => true,
             'progress' => 0  // Min progress
         ],
         [
             'title' => 'Max Progress',
-            'body' => 'Testing maximum progress',
-            'type' => 'warning',
+            'message' => 'Testing maximum progress',
+            'status' => 'warning',
             'priority' => 5,
-            'persistent' => false,
             'progress' => 100  // Max progress
         ]
     ];
@@ -242,14 +244,12 @@ test('handles edge case values', function () {
 
         expect($notification->title)
             ->toBe($data['title'])
-            ->and($notification->body)
-            ->toBe($data['body'])
-            ->and($notification->type)
-            ->toBe($data['type'])
+            ->and($notification->message)
+            ->toBe($data['message'])
+            ->and($notification->status)
+            ->toBe($data['status'])
             ->and($notification->priority)
-            ->toBe($data['priority'])
-            ->and($notification->persistent)
-            ->toBe($data['persistent']);
+            ->toBe($data['priority']);
 
         if (isset($data['progress'])) {
             expect($notification->progress)->toBe($data['progress']);

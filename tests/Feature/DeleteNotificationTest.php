@@ -13,10 +13,9 @@ test('deletes notification', function () {
     // Create a notification to delete
     $notification = $service->createNotification([
         'title' => 'Test Notification',
-        'body' => 'This is a test notification',
-        'type' => 'info',
+        'message' => 'This is a test notification',
+        'status' => 'info',
         'priority' => 5,
-        'persistent' => false
     ]);
 
     // This would require proper database mocking
@@ -31,18 +30,16 @@ test('deletes all notifications for current user', function () {
 
     $notification = $service->createNotification([
         'title' => 'Test Notification',
-        'body' => 'This is a test notification',
-        'type' => 'info',
+        'message' => 'This is a test notification',
+        'status' => 'info',
         'priority' => 5,
-        'persistent' => false
     ]);
 
     $notification = $service->createNotification([
         'title' => 'Test Notification',
-        'body' => 'This is a test notification',
-        'type' => 'info',
+        'message' => 'This is a test notification',
+        'status' => 'info',
         'priority' => 5,
-        'persistent' => false
     ]);
 
     expect($service->getNotificationCount())->not->toBe(0);

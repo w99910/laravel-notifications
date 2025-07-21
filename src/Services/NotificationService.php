@@ -23,14 +23,10 @@ class NotificationService
     protected bool $logging = false;
 
     public function __construct(
-        User|string|int $user,
+        User $user,
         NotificationInterface|null|string $notificationInterface = null,
         bool $logging = false,
     ) {
-        if (is_string($user) || is_int($user)) {
-            $user = User::findOrFail($user);
-        }
-
         if (!method_exists($user, 'notify')) {
             throw new \InvalidArgumentException('User must implement the notify method. You may use Illuminate\Notifications\Notifiable trait.');
         }
@@ -42,6 +38,10 @@ class NotificationService
         }
 
         if (is_string($notificationInterface)) {
+            if (!class_exists($notificationInterface)) {
+                throw new \InvalidArgumentException('Notification interface class does not exist: ' . $notificationInterface);
+            }
+
             $notificationInterface = new $notificationInterface();
         }
 

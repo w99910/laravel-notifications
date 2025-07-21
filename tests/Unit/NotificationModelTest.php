@@ -7,18 +7,17 @@ test('implements NotificationInterface', function () {
     $data = [
         'id' => 1,
         'title' => 'Test Notification',
-        'body' => 'This is a test notification body',
+        'message' => 'This is a test notification message',
         'user_id' => 1,
-        'type' => 'info',
+        'status' => 'info',
         'priority' => 5,
-        'topic_id' => 123,
-        'persistent' => true,
-        'icon' => 'bell',
+        'category' => 123,
+        'avatar' => 'bell',
         'read_at' => null,
         'created_at' => now(),
-        'actions' => ['view', 'dismiss'],
+        'actions' => [['label' => 'view', 'url' => 'test.com'], ['label' => 'dismiss', 'url' => 'test2.com']],
         'progress' => 75,
-        'error' => null
+        'attachment' => 'path/to/file.pdf'
     ];
 
     $notification = new Notification($data);
@@ -31,18 +30,17 @@ test('has correct fillable attributes', function () {
 
     $expected = [
         'title',
-        'body',
+        'message',
         'user_id',
-        'type',
+        'status',
         'priority',
-        'topic_id',
-        'persistent',
-        'icon',
+        'category',
+        'avatar',
         'read_at',
         'created_at',
         'actions',
         'progress',
-        'error'
+        'attachment',
     ];
 
     expect($notification->getFillable())->toBe($expected);
@@ -54,10 +52,10 @@ test('returns correct title', function () {
     expect($notification->getTitle())->toBe('Test Notification');
 });
 
-test('returns correct body', function () {
-    $notification = new Notification(['body' => 'This is a test notification body']);
+test('returns correct message', function () {
+    $notification = new Notification(['message' => 'This is a test notification message']);
 
-    expect($notification->getBody())->toBe('This is a test notification body');
+    expect($notification->getMessage())->toBe('This is a test notification message');
 });
 
 test('returns correct user ID', function () {
@@ -66,10 +64,10 @@ test('returns correct user ID', function () {
     expect($notification->getUserId())->toBe(1);
 });
 
-test('returns correct type', function () {
-    $notification = new Notification(['type' => 'info']);
+test('returns correct status', function () {
+    $notification = new Notification(['status' => 'info']);
 
-    expect($notification->getType())->toBe('info');
+    expect($notification->getStatus())->toBe('info');
 });
 
 test('returns correct priority', function () {
@@ -81,19 +79,19 @@ test('returns correct priority', function () {
 test('can be created with minimal data', function () {
     $minimal = new Notification([
         'title' => 'Minimal',
-        'body' => 'Body',
+        'message' => 'Message',
         'user_id' => 1,
-        'type' => 'info',
+        'status' => 'info',
         'priority' => 1
     ]);
 
     expect($minimal->title)
         ->toBe('Minimal')
-        ->and($minimal->body)
-        ->toBe('Body')
+        ->and($minimal->message)
+        ->toBe('Message')
         ->and($minimal->user_id)
         ->toBe(1)
-        ->and($minimal->type)
+        ->and($minimal->status)
         ->toBe('info')
         ->and($minimal->priority)
         ->toBe(1);
@@ -102,21 +100,21 @@ test('can be created with minimal data', function () {
 test('handles null values correctly', function () {
     $notification = new Notification([
         'title' => 'Test',
-        'body' => 'Body',
+        'message' => 'Message',
         'user_id' => 1,
-        'type' => 'info',
+        'status' => 'info',
         'priority' => 1,
-        'topic_id' => null,
-        'icon' => null,
+        'category' => null,
+        'avatar' => null,
         'read_at' => null,
         'actions' => null,
         'progress' => null,
-        'error' => null
+        'attachment' => null
     ]);
 
-    expect($notification->topic_id)
+    expect($notification->category)
         ->toBeNull()
-        ->and($notification->icon)
+        ->and($notification->avatar)
         ->toBeNull()
         ->and($notification->read_at)
         ->toBeNull()
@@ -124,42 +122,21 @@ test('handles null values correctly', function () {
         ->toBeNull()
         ->and($notification->progress)
         ->toBeNull()
-        ->and($notification->error)
+        ->and($notification->attachment)
         ->toBeNull();
 });
 
-test('handles boolean persistent attribute', function () {
-    $persistent = new Notification([
-        'title' => 'Test',
-        'body' => 'Body',
-        'user_id' => 1,
-        'type' => 'info',
-        'priority' => 1,
-        'persistent' => true
-    ]);
-
-    $nonPersistent = new Notification([
-        'title' => 'Test',
-        'body' => 'Body',
-        'user_id' => 1,
-        'type' => 'info',
-        'priority' => 1,
-        'persistent' => false
-    ]);
-
-    expect($persistent->persistent)
-        ->toBeTrue()
-        ->and($nonPersistent->persistent)
-        ->toBeFalse();
-});
-
 test('handles array actions attribute', function () {
-    $actions = ['view', 'dismiss', 'archive'];
+    $actions = [
+        ['label' => 'view', 'url' => 'https://example.com/view'],
+        ['label' => 'dismiss', 'url' => 'https://example.com/dismiss'],
+        ['label' => 'archive', 'url' => 'https://example.com/archive']
+    ];
     $notification = new Notification([
         'title' => 'Test',
-        'body' => 'Body',
+        'message' => 'Message',
         'user_id' => 1,
-        'type' => 'info',
+        'status' => 'info',
         'priority' => 1,
         'actions' => $actions
     ]);
@@ -170,9 +147,9 @@ test('handles array actions attribute', function () {
 test('handles progress attribute', function () {
     $notification = new Notification([
         'title' => 'Test',
-        'body' => 'Body',
+        'message' => 'Message',
         'user_id' => 1,
-        'type' => 'info',
+        'status' => 'info',
         'priority' => 1,
         'progress' => 50
     ]);
@@ -185,12 +162,52 @@ test('provides all required interface methods', function () {
 
     expect(method_exists($notification, 'getTitle'))
         ->toBeTrue()
-        ->and(method_exists($notification, 'getBody'))
+        ->and(method_exists($notification, 'getMessage'))
         ->toBeTrue()
         ->and(method_exists($notification, 'getUserId'))
         ->toBeTrue()
-        ->and(method_exists($notification, 'getType'))
+        ->and(method_exists($notification, 'getStatus'))
         ->toBeTrue()
         ->and(method_exists($notification, 'getPriority'))
+        ->toBeTrue()
+        ->and(method_exists($notification, 'getCategory'))
+        ->toBeTrue()
+        ->and(method_exists($notification, 'getAvatar'))
+        ->toBeTrue()
+        ->and(method_exists($notification, 'getActions'))
+        ->toBeTrue()
+        ->and(method_exists($notification, 'getProgress'))
+        ->toBeTrue()
+        ->and(method_exists($notification, 'getAttachment'))
         ->toBeTrue();
+});
+
+test('handles attachment attribute', function () {
+    $notification = new Notification([
+        'title' => 'Test',
+        'message' => 'Message',
+        'user_id' => 1,
+        'status' => 'info',
+        'priority' => 1,
+        'attachment' => '/path/to/file.pdf'
+    ]);
+
+    expect($notification->attachment)->toBe('/path/to/file.pdf');
+});
+
+test('handles category and avatar attributes', function () {
+    $notification = new Notification([
+        'title' => 'Test',
+        'message' => 'Message',
+        'user_id' => 1,
+        'status' => 'info',
+        'priority' => 1,
+        'category' => 42,
+        'avatar' => 'user.png'
+    ]);
+
+    expect($notification->category)
+        ->toBe(42)
+        ->and($notification->avatar)
+        ->toBe('user.png');
 });

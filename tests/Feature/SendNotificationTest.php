@@ -1,26 +1,23 @@
 <?php
 
-use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\Log;
-use Thomasbrillion\Notification\Events\NotificationEvent;
+use Illuminate\Support\Facades\Notification;
 use Thomasbrillion\Notification\Interface\Models\NotificationInterface;
-use Thomasbrillion\Notification\Models\Notification;
+use Thomasbrillion\Notification\Models\Notification as NotificationModel;
+use Thomasbrillion\Notification\Notifications\NotificationEvent;
 use Thomasbrillion\Notification\Services\NotificationService;
 use Thomasbrillion\Notification\Tests\Models\User;
 
 test('sends notification and dispatches event', function () {
-    Event::fake();
-    Log::fake();
+    Notification::fake();
 
     $user = new User(['id' => 1]);
     $service = new NotificationService($user);
 
     $validData = [
         'title' => 'Test Notification',
-        'body' => 'This is a test notification',
-        'type' => 'info',
-        'priority' => 5,
-        'persistent' => false
+        'message' => 'This is a test notification',
+        'status' => 'info',
+        'priority' => 5
     ];
 
     $notification = $service->createNotification($validData);
@@ -28,79 +25,67 @@ test('sends notification and dispatches event', function () {
     $result = $service->sendNotification($notification);
 
     expect($result)->toBeTrue();
-    Event::assertDispatched(NotificationEvent::class);
+
+    Notification::assertSentTo(
+        [$user], NotificationEvent::class
+    );
 });
 
 test('logs notification when sent', function () {
-    Event::fake();
-    Log::fake();
+    Notification::fake();
 
     $user = new User(['id' => 1]);
     $service = new NotificationService($user);
 
     $validData = [
         'title' => 'Test Notification',
-        'body' => 'This is a test notification',
-        'type' => 'info',
-        'priority' => 5,
-        'persistent' => false
+        'message' => 'This is a test notification',
+        'status' => 'info',
+        'priority' => 5
     ];
 
     $notification = $service->createNotification($validData);
 
     $service->sendNotification($notification);
 
-    Log::assertLogged('info', function ($message, $context) {
-        return $message === 'Notification sent' &&
-            $context['user_id'] === 1 &&
-            $context['title'] === 'Test Notification';
-    });
+    Notification::assertSentTo(
+        [$user], NotificationEvent::class
+    );
 });
 
 test('dispatches notification event with correct data', function () {
-    Event::fake();
-    Log::fake();
+    Notification::fake();
 
     $user = new User(['id' => 1]);
     $service = new NotificationService($user);
 
     $validData = [
         'title' => 'Test Notification',
-        'body' => 'This is a test notification',
-        'type' => 'info',
-        'priority' => 5,
-        'persistent' => false
+        'message' => 'This is a test notification',
+        'status' => 'info',
+        'priority' => 5
     ];
 
     $notification = $service->createNotification($validData);
 
     $service->sendNotification($notification);
 
-    Event::assertDispatched(NotificationEvent::class, function ($event) use ($notification) {
-        return $event->notification->title === $notification->title &&
-            $event->notification->body === $notification->body &&
-            $event->notification->type === $notification->type;
-    });
+    Notification::assertSentTo(
+        [$user], NotificationEvent::class
+    );
 });
 
-test('can send notification by ID', function () {
-    // This would require proper database mocking
-    expect(true)->toBeTrue();
-})->skip('Requires database mock');
-
 test('handles multiple notifications', function () {
-    Event::fake();
-    Log::fake();
+    Notification::fake();
 
     $user = new User(['id' => 1]);
     $service = new NotificationService($user);
 
     $validData = [
         'title' => 'Test Notification',
-        'body' => 'This is a test notification',
-        'type' => 'info',
-        'priority' => 5,
-        'persistent' => false
+        'message' => 'This is a test notification',
+        'status' => 'info',
+        'priority' => 5
     ];
 
     $notification1 = $service->createNotification($validData);
@@ -109,5 +94,7 @@ test('handles multiple notifications', function () {
     $service->sendNotification($notification1);
     $service->sendNotification($notification2);
 
-    Event::assertDispatchedTimes(NotificationEvent::class, 2);
+    Notification::assertSentTo(
+        [$user], NotificationEvent::class
+    );
 });

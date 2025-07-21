@@ -1,9 +1,9 @@
 <?php
 
 use Illuminate\Support\Facades\Event;
-use Thomasbrillion\Notification\Events\NotificationEvent;
 use Thomasbrillion\Notification\Interface\Models\NotificationInterface;
 use Thomasbrillion\Notification\Models\Notification;
+use Thomasbrillion\Notification\Notifications\NotificationEvent;
 use Thomasbrillion\Notification\Services\NotificationService;
 use Thomasbrillion\Notification\Tests\Models\User;
 
@@ -69,7 +69,7 @@ test('creates notification with all optional fields', function () {
         'message' => 'This is a test notification',
         'status' => 'info',
         'priority' => 5,
-        'category' => 123,
+        'category' => 'something',
         'avatar' => 'bell',
         'actions' => $actions,
         'progress' => 50,
@@ -81,7 +81,7 @@ test('creates notification with all optional fields', function () {
     expect($result)
         ->toBeInstanceOf(NotificationInterface::class)
         ->and($result->category)
-        ->toBe(123)
+        ->toBe('something')
         ->and($result->avatar)
         ->toBe('bell')
         ->and($result->actions)
@@ -294,7 +294,7 @@ test('creates notification with category and avatar', function () {
         'message' => 'This is a test notification',
         'status' => 'info',
         'priority' => 5,
-        'category' => 42,
+        'category' => 'something',
         'avatar' => 'user-icon.png'
     ];
 
@@ -303,7 +303,7 @@ test('creates notification with category and avatar', function () {
     expect($result)
         ->toBeInstanceOf(NotificationInterface::class)
         ->and($result->category)
-        ->toBe(42)
+        ->toBe('something')
         ->and($result->avatar)
         ->toBe('user-icon.png');
 });

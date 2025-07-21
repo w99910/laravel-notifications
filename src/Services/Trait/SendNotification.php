@@ -16,15 +16,15 @@ trait SendNotification
             $notification = $this->getEloquentQuery()->findOrFail($notification);
         }
 
+        // Send via Laravel notifications
         $this->getUser()->notify(new NotificationEvent($notification));
-
         // Optionally, you can log the notification or perform additional actions here
         if ($this->shouldLog()) {
             \Log::info('Notification sent', [
                 'user_id' => $this->getUser()->id,
                 'notification_id' => $notification->id,
                 'title' => $notification->title,
-                'body' => $notification->body,
+                'message' => $notification->message,
             ]);
         }
 

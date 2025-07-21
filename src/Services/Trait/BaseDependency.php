@@ -21,7 +21,7 @@ trait BaseDependency
             'message' => 'required|string',
             'status' => 'required|string|in:info,warning,error,success',
             'priority' => 'nullable|integer|min:1|max:10',
-            'category' => 'nullable|integer|nullable',
+            'category' => 'nullable|string|nullable',
             'avatar' => 'nullable|string|nullable',
             'actions' => 'nullable|array|nullable',
             'actions.*.label' => 'required|string|nullable',

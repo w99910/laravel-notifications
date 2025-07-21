@@ -19,6 +19,7 @@ trait CreateNotification
         $validated['read_at'] = null;  // Default to null for new notifications
         $validated['priority'] = $validated['priority'] ?? 5;  // Default priority if not set
 
+        $validated['category'] = $validated['category'] ?? 'inbox';  // Default category if not set
         $notification = $this->getEloquentQuery()->create($validated);
 
         if ($this->shouldLog()) {
