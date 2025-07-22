@@ -21,7 +21,7 @@ trait UpdateNotification
             'avatar' => 'nullable|string|nullable',
             'actions' => 'nullable|array|nullable',
             'actions.*.label' => 'required|string|nullable',
-            'actions.*.url' => 'required|url|nullable',
+            'actions.*.url' => 'required|string|nullable',
             'progress' => 'nullable|integer|min:0|max:100|nullable',
             'attachment' => 'nullable|string|nullable',
             'created_at' => 'nullable|date|nullable',

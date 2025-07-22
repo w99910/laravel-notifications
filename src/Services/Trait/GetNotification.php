@@ -67,6 +67,8 @@ trait GetNotification
             $order = $validated['order_direction'] ?? 'desc';
 
             $query->orderBy($validated['order_by'], $order);
+        } else {
+            $query->orderBy('created_at', 'desc');
         }
 
         if (isset($validated['offset'])) {
