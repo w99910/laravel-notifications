@@ -24,13 +24,6 @@ class NotificationController
         });
     }
 
-    protected NotificationService $notificationService;
-
-    public function __construct(Request $request)
-    {
-        $this->notificationService = new NotificationService($request->user() ?? \Auth::user());
-    }
-
     public function getUserId(Request $request)
     {
         $user = $request->user() ?? \Auth::user();
@@ -40,45 +33,45 @@ class NotificationController
         return $user->getKey() ?? $user->id ?? $user->getAuthIdentifier();
     }
 
-    public function getNotifications(Request $request)
+    public function getNotifications(Request $request, NotificationService $notificationService)
     {
-        return $this->notificationService->getNotifications($request->all());
+        return $notificationService->getNotifications($request->all());
     }
 
-    public function getNotificationCount()
+    public function getNotificationCount(Request $request, NotificationService $notificationService)
     {
-        return $this->notificationService->getNotificationCount();
+        return $notificationService->getNotificationCount();
     }
 
-    public function getUnreadNotifications()
+    public function getUnreadNotifications(Request $request, NotificationService $notificationService)
     {
-        return $this->notificationService->getUnreadNotifications();
+        return $notificationService->getUnreadNotifications();
     }
 
-    public function getReadNotifications()
+    public function getReadNotifications(Request $request, NotificationService $notificationService)
     {
-        return $this->notificationService->getReadNotifications();
+        return $notificationService->getReadNotifications();
     }
 
-    public function markAsRead(Request $request)
+    public function markAsRead(Request $request, NotificationService $notificationService)
     {
         $notificationId = $request->input('id');
-        return $this->notificationService->markAsRead($notificationId);
+        return $notificationService->markAsRead($notificationId);
     }
 
-    public function markAllAsRead()
+    public function markAllAsRead(Request $request, NotificationService $notificationService)
     {
-        return $this->notificationService->markAllAsRead();
+        return $notificationService->markAllAsRead();
     }
 
-    public function deleteNotification(Request $request)
+    public function deleteNotification(Request $request, NotificationService $notificationService)
     {
         $notificationId = $request->input('id');
-        return $this->notificationService->deleteNotification($notificationId);
+        return $notificationService->deleteNotification($notificationId);
     }
 
-    public function deleteAllNotifications()
+    public function deleteAllNotifications(Request $request, NotificationService $notificationService)
     {
-        return $this->notificationService->deleteAllNotifications();
+        return $notificationService->deleteAllNotifications();
     }
 }

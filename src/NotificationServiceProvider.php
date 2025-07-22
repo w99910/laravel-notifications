@@ -31,5 +31,11 @@ class NotificationServiceProvider extends ServiceProvider
                 __DIR__ . '/../config/notification.php' => $destinationPath,
             ], 'notification');
         }
+
+        $app->bind(NotificationService::class, function ($app) {
+            $user = $app->make('auth')->user();
+
+            return new NotificationService($user);
+        });
     }
 }
