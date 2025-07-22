@@ -28,12 +28,16 @@ class NotificationController
 
     public function __construct(Request $request)
     {
-        $this->notificationService = new NotificationService($request->user());
+        $this->notificationService = new NotificationService($request->user() ?? \Auth::user());
     }
 
     public function getUserId(Request $request)
     {
-        return $request->user()->getKey() ?? $request->user()->id ?? $request->user()->getAuthIdentifier();
+        $user = $request->user() ?? \Auth::user();
+        if (!$user) {
+            throw new \InvalidArgumentException('User not authenticated. Please ensure you are logged in.');
+        }
+        return $user->getKey() ?? $user->id ?? $user->getAuthIdentifier();
     }
 
     public function getNotifications(Request $request)
