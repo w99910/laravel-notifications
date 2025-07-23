@@ -55,7 +55,7 @@ class NotificationController
 
     public function markAsRead(Request $request, NotificationService $notificationService)
     {
-        $notificationId = $request->input('id');
+        $notificationId = $request->input('id') ?? $request->input('ids');
         return $notificationService->markAsRead($notificationId);
     }
 

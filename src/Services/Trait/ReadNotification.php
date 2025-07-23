@@ -6,8 +6,16 @@ trait ReadNotification
 {
     use BaseDependency;
 
-    public function markAsRead(int|string $notificationId): bool
+    public function markAsRead(int|string|array $notificationId): bool
     {
+        if (is_array($notificationId)) {
+            return $this
+                ->getDBQuery()
+                ->where('user_id', $this->getUser()->id)
+                ->whereIn('id', $notificationId)
+                ->update(['read_at' => now()]);
+        }
+
         return $this
             ->getDBQuery()
             ->where('user_id', $this->getUser()->id)
