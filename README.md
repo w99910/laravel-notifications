@@ -79,3 +79,40 @@ GET|HEAD   notifications/user ..................................................
 ```
 
 ## Usage
+
+Let's look at a simple example below.
+
+```php
+$user = \App\Models\User::find(328);
+$service = new \Thomasbrillion\Notification\Services\NotificationService($user);
+
+// $notification = Notification::first();
+$notification = $service->createNotification([
+       'title' => 'System',
+       'message' => 'Preparing...',
+       'status' => 'warning',
+       'category' => 'inbox',
+       'actions' => [],
+       'progress' => 0,
+       'attachment' => null,
+]);
+$service->sendNotification($notification);
+
+sleep(2);
+$service->updateNotificationProgress($notification->id, 20);
+
+sleep(2);
+$service->updateNotificationProgress($notification->id, 50);
+
+sleep(5);
+$service->updateNotification($notification->id, [
+          'status' => 'success',
+          'progress' => 100,
+          'actions' => [
+              [
+                  'label' => 'View Details',
+                  'url' => 'https://example.com/details',
+              ],
+          ],
+      ]);
+```
