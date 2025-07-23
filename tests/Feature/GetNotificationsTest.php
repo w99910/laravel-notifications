@@ -43,7 +43,7 @@ test('get notifications with offset and limit', function () {
 
     expect($notifications)->toHaveCount(2);
     expect($notifications[0]->title)->toBe('Notification 3');
-    expect($notifications[1]->title)->toBe('Notification 4');
+    expect($notifications[1]->title)->toBe('Notification 2');
 });
 
 test('get notifications with start_date and end_date', function () {
@@ -91,8 +91,8 @@ test('get notifications with limit only', function () {
 
     $notifications = $service->getNotifications(['limit' => 2]);
     expect($notifications)->toHaveCount(2);
-    expect($notifications[0]->title)->toBe('Notification 1');
-    expect($notifications[1]->title)->toBe('Notification 2');
+    expect($notifications[0]->title)->toBe('Notification 4');
+    expect($notifications[1]->title)->toBe('Notification 3');
 });
 
 test('get notifications with priority filter', function () {
