@@ -2,6 +2,14 @@
 
 A Laravel package for handling notifications across multiple Laravel versions.
 
+![1](assets/1.png)
+
+![2](assets/2.png)
+
+![3](assets/3.png)
+
+![4](assets/4.png)
+
 ## Installation
 
 Add repository in `composer.json` file.
@@ -15,7 +23,9 @@ Add repository in `composer.json` file.
    },
 ]
 ```
+
 Then install the package.
+
 ```bash
 composer require thomasbrillion/notification
 ```
@@ -25,7 +35,9 @@ composer require thomasbrillion/notification
 ```bash
 php artisan vendor:publish --provider="Thomasbrillion\Notification\NotificationServiceProvider"
 ```
-Or 
+
+Or
+
 ```bash
 php artisan vendor:publish --tag="notification"
 ```
@@ -50,7 +62,7 @@ If you are using different Eloquent model, you can specify your class in `config
 ]
 ```
 
-> Important: Your notification model should implement `Thomasbrillion\Notification\Interface\Models\NotificationInterface`. 
+> Important: Your notification model should implement `Thomasbrillion\Notification\Interface\Models\NotificationInterface`.
 
 This library includes required routes to interact with notifications via API.
 
@@ -67,5 +79,3 @@ GET|HEAD   notifications/user ..................................................
 ```
 
 ## Usage
-
-
